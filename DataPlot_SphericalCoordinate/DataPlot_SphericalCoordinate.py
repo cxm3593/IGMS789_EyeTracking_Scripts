@@ -2,7 +2,7 @@ from unicodedata import name
 from matplotlib.axis import XAxis
 import plotly
 import pandas
-from pandas import Series
+from pandas import DataFrame, Series
 import numpy
 import os
 
@@ -10,8 +10,8 @@ import os
 DirectoryPath:str = "Data"
 TargetFile:str = "gaze_positions.csv"
 vector_name:str = "gaze_point_3d"
-plot_width:int = 800
-plot_height:int = 600
+plot_width:int = 1280
+plot_height:int = 720
 plot_marker_size = 5
 plot_opacity = 0.8
 plot_layout = dict(
@@ -29,7 +29,7 @@ plot_layout = dict(
 
 # Data Input
 DataPath:str = os.path.join(DirectoryPath, TargetFile)
-data:str = pandas.read_csv(DataPath)
+data:DataFrame = pandas.read_csv(DataPath)
 
 # Data Processing 
 def calculateSphericalCoordinate(row: Series, varName: str) -> tuple:
@@ -48,12 +48,12 @@ data['gaze_az'],data['gaze_el'] = zip(*SphericalCoordinates)
 
 # Plot Data
 ## First process timestamp
-normalized_timestamps = numpy.array(data['gaze_timestamp'] - data['gaze_timestamp'].iloc[0])
-time_miliseconds = numpy.arange(len(normalized_timestamps))
+normalized_timestamps:numpy.ndarray = numpy.array(data['gaze_timestamp'] - data['gaze_timestamp'].iloc[0])
+time:numpy.ndarray = numpy.arange(len(normalized_timestamps))
 
 ## Plot
 az_graph:plotly.graph_objects.scattergl = plotly.graph_objects.Scattergl(
-	x = time_miliseconds,
+	x = time,
 	y = data['gaze_az'],
 	name = "Gaze Direction in Spherical Coordinate (azimuth)",
 	mode='markers',
@@ -62,7 +62,7 @@ az_graph:plotly.graph_objects.scattergl = plotly.graph_objects.Scattergl(
 )
 
 el_graph:plotly.graph_objects.scattergl = plotly.graph_objects.Scattergl(
-	x = time_miliseconds,
+	x = time,
 	y = data['gaze_el'],
 	name = "Gaze Direction in Spherical Coordinate (elevation)",
 	mode='markers',
