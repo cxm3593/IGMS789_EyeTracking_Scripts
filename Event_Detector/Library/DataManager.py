@@ -30,3 +30,9 @@ class DataManager:
 		self.gaze_data = pandas.read_csv(self.gaze_path)
 		self.pupil_data = pandas.read_csv(self.pupil_path)
 		print("Done.")
+
+	def find_gaze_SampleRate(self) -> float:
+		gaze_samples = self.gaze_data.shape[0]
+		gaze_timeperiod = self.gaze_data["gaze_timestamp"].iloc[gaze_samples-1] - self.gaze_data["gaze_timestamp"].iloc[0]
+		sample_rate = gaze_samples / gaze_timeperiod
+		return sample_rate
