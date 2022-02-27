@@ -1,3 +1,4 @@
+from matplotlib.pyplot import figure
 import plotly
 import pandas
 from pandas import DataFrame, Series
@@ -29,7 +30,8 @@ class DataPlotter:
 			self,
 			index_pairs,
 			time:numpy.ndarray, 
-			figure:plotly.graph_objects.Figure
+			figure:plotly.graph_objects.Figure,
+			color:str = "LightSalmon"
 		):
 		'''Given [[i1, i2], [i3, i4]...], draw patch on the plot'''
 		for pair in index_pairs:
@@ -40,14 +42,18 @@ class DataPlotter:
 
 			figure.add_vrect(
 				x0=start_time, x1=end_time,
-				fillcolor="LightSalmon", opacity=0.5,
+				fillcolor=color, opacity=0.5,
 				layer="below", line_width=0,
 			)
 
 
-	def plot(self, index_pairs) -> None:
-		normalized_timestamps:numpy.ndarray = numpy.array(self.data['gaze_timestamp'] - self.data['gaze_timestamp'].iloc[0])
-		time:numpy.ndarray = numpy.arange(len(normalized_timestamps))
+	def plot(self, index_pairs = None, color:str = "LightSalmon", timeColumnName = "gaze_timestamp") -> None:
+
+
+		normalized_timestamps:numpy.ndarray = numpy.array(self.data[timeColumnName] - self.data[timeColumnName].iloc[0])
+
+		#time:numpy.ndarray = numpy.arange(len(normalized_timestamps))
+		time:numpy.ndarray = normalized_timestamps
 
 		graph_list = []
 		for data_name in self.plot_namelist:
@@ -66,6 +72,11 @@ class DataPlotter:
 			layout = DataPlotter.plot_layout
 		)
 
-		self._drawHighLight(index_pairs, time, figure)
+		if index_pairs != None:
+			self._drawHighLight(index_pairs, time, figure)
 
 		figure.show()
+
+
+
+

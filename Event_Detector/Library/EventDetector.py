@@ -119,6 +119,45 @@ class IDT_Detector(EventDetector):
 					break
 		print("IDT Detection Finished.")
 
-		
+class IVT_Detector(EventDetector):
 
+	def __init__(self, gaze_data: pandas.DataFrame, velocity_threshold:float) -> None:
+		super().__init__(gaze_data)
+		self.velocity_threshold = velocity_threshold
+
+
+	def calculateVelocity(self):
+		self.gaze_data["displace_az"] = self.gaze_data["gaze_az"].diff()
+		self.gaze_data["displace_el"] = self.gaze_data["gaze_el"].diff()
+		self.gaze_data["delta_time"] = self.gaze_data["vidTimeStamp"].diff()
+
+		# self.gaze_data["velocity_az"] = self.gaze_data["displace_az"] / self.gaze_data["delta_time"]
+		# self.gaze_data["velocity_el"] = self.gaze_data["displace_el"] / self.gaze_data["delta_time"]
+
+		self.gaze_data["displace"] = numpy.sqrt(
+			self.gaze_data["displace_az"] * self.gaze_data["displace_az"] +
+			self.gaze_data["displace_el"] * self.gaze_data["displace_el"]
+			)
+
+
+		self.gaze_data["velocity"] = self.gaze_data["displace"] / self.gaze_data["delta_time"]
+		#self.gaze_data["velocity"] = self.gaze_data["velocity_az"] + self.gaze_data["velocity_el"]
+
+
+		#print(self.gaze_data["displace"])
+		#print(self.gaze_data["delta_time"])
+		#print(self.gaze_data["velocity"])
+
+	def detect(self):
+		saccade_start:int = 0
+		saccade_end:int = 0
+		inSaccade:bool = False
+		for i in range(0, self.gaze_data.shape[0]) :
+			if self.gaze_data["velocity"].iloc[i] > self.velocity_threshold and inSaccade == False: # if find a saccade start
+				saccade_start = i
+				inSaccade = True
+			elif self.gaze_data["velocity"].iloc[i] < self.velocity_threshold and inSaccade == True: # if find a saccade end
+				saccade_end = i
+				inSaccade = False
+				self.saccade.append([saccade_start, saccade_end])
 

@@ -36,3 +36,5 @@ class DataManager:
 		gaze_timeperiod = self.gaze_data["gaze_timestamp"].iloc[gaze_samples-1] - self.gaze_data["gaze_timestamp"].iloc[0]
 		sample_rate = gaze_samples / gaze_timeperiod
 		return sample_rate
+
+
